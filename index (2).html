@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hashtag Splitter — Input & Split Hashtags</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+    --bg: #F3F4FB;
+    --surface: #FFFFFF;
+    --surface-alt: #F4F5FB;
+    --surface-alt-2: #ECEEF9;
+    --border: #E7E9F5;
+    --border-strong: #D7DAEE;
+
+    --text-primary: #12131F;
+    --text-secondary: #5D6079;
+    --text-muted: #999CB5;
+
+    --primary: #4F46E5;
+    --primary-2: #7C3AED;
+    --primary-dark: #3E35C7;
+    --primary-soft: #EEEDFD;
+
+    --success: #059669;
+    --success-soft: #E1F7EE;
+
+    --warning: #D97706;
+    --warning-soft: #FEF1DC;
+
+    --danger: #E11D48;
+    --danger-soft: #FDE7EC;
+
+    --info: #2563EB;
+    --info-soft: #E6EEFE;
+
+    --shadow-sm: 0 2px 8px rgba(18,19,31,0.05);
+    --shadow-md: 0 8px 24px rgba(30,26,80,0.08);
+    --shadow-lg: 0 20px 48px rgba(30,26,80,0.16);
+
+    --radius-sm: 9px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+
+    --font-display:'Sora','Inter',sans-serif;
+    --font-body:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+    background:var(--bg);
+    font-family:var(--font-body);
+    color:var(--text-primary);
+    padding:32px 20px 80px;
+    line-height:1.45;
+}
+.wrap{max-width:920px;margin:0 auto;}
+
+.page-head{margin-bottom:24px;}
+.page-head h1{
+    font-family:var(--font-display);
+    font-size:26px;
+    font-weight:800;
+    display:flex;align-items:center;gap:10px;
+}
+.page-head p{color:var(--text-secondary);margin-top:6px;font-size:14px;}
+
+.panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:22px;
+    box-shadow:var(--shadow-sm);
+    margin-bottom:20px;
+}
+.panel-title{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:16px;
+    margin-bottom:14px;
+}
+
+textarea{
+    width:100%;
+    min-height:160px;
+    resize:vertical;
+    border:1.5px solid var(--border-strong);
+    border-radius:var(--radius-md);
+    padding:14px;
+    font-family:var(--font-body);
+    font-size:14px;
+    color:var(--text-primary);
+    background:var(--surface-alt);
+    outline:none;
+    transition:border-color .15s;
+}
+textarea:focus{border-color:var(--primary);background:var(--surface);}
+textarea::placeholder{color:var(--text-muted);}
+
+.hint{font-size:12.5px;color:var(--text-muted);margin-top:8px;}
+
+.field-label{display:block;font-size:12.5px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;}
+.text-input{
+    width:100%;
+    border:1.5px solid var(--border-strong);
+    border-radius:var(--radius-md);
+    padding:11px 14px;
+    font-family:var(--font-body);
+    font-size:14px;
+    color:var(--text-primary);
+    background:var(--surface-alt);
+    outline:none;
+    transition:border-color .15s;
+}
+.text-input:focus{border-color:var(--primary);background:var(--surface);}
+.text-input::placeholder{color:var(--text-muted);}
+
+.owner-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    padding:6px 12px;border-radius:999px;
+    font-size:12.5px;font-weight:700;
+    background:var(--primary-soft);color:var(--primary);
+}
+
+.history-filter-row{display:flex;gap:10px;margin-bottom:14px;}
+.history-filter-row .text-input{flex:1;}
+
+.stats-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+
+.chip{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:6px 12px;border-radius:999px;
+    font-size:12.5px;font-weight:600;
+    background:var(--surface-alt-2);color:var(--text-secondary);
+    border:1px solid var(--border);
+}
+.chip-info{background:var(--info-soft);color:var(--info);border-color:transparent;}
+.chip-success{background:var(--success-soft);color:var(--success);border-color:transparent;}
+.chip-danger{background:var(--danger-soft);color:var(--danger);border-color:transparent;}
+
+.actions-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+
+.btn{
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:13.5px;
+    border:none;
+    border-radius:var(--radius-sm);
+    padding:11px 18px;
+    cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:transform .1s, box-shadow .15s, opacity .15s;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;box-shadow:0 10px 24px rgba(79,70,229,0.28);}
+.btn-outline{background:var(--surface);color:var(--text-secondary);border:1.5px solid var(--border-strong);}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-icon{padding:8px 10px;}
+.btn-block{width:100%;justify-content:center;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+
+.tagar-result-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+
+.tagar-duplicate-panel{
+    background:var(--danger-soft);border:1px solid rgba(225,29,72,0.25);
+    border-radius:var(--radius-md);padding:14px;margin-bottom:16px;
+}
+.tdp-title{font-weight:700;color:var(--danger);font-size:13.5px;margin-bottom:10px;}
+.tagar-duplicate-list{display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;}
+.tagar-duplicate-item{display:flex;justify-content:space-between;gap:10px;font-size:13px;background:#fff;border-radius:8px;padding:7px 10px;}
+.tdi-name{font-weight:600;}
+.tdi-meta{color:var(--text-secondary);white-space:nowrap;}
+
+.tagar-clean-panel{
+    background:var(--success-soft);border:1px solid rgba(5,150,105,0.25);
+    color:var(--success);font-weight:600;font-size:13.5px;
+    border-radius:var(--radius-md);padding:14px;margin-bottom:16px;
+}
+
+.tagar-groups-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;
+}
+.tagar-group-card{
+    border:1px solid var(--border);border-radius:var(--radius-md);
+    padding:14px;background:var(--surface-alt);display:flex;flex-direction:column;gap:10px;
+}
+.tgc-head{display:flex;justify-content:space-between;align-items:center;}
+.tgc-title{font-weight:700;font-size:13.5px;}
+.tagar-group-box{
+    max-height:200px;overflow-y:auto;background:#fff;border:1px solid var(--border);
+    border-radius:8px;padding:8px 10px;font-size:12.5px;
+}
+.tg-line{display:flex;gap:6px;padding:2px 0;}
+.tg-idx{color:var(--text-muted);min-width:22px;}
+.tg-idx.is-dup{color:var(--danger);font-weight:700;}
+
+.tagar-history-item{border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:10px;overflow:hidden;}
+.tagar-history-head{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;cursor:pointer;background:var(--surface);}
+.tagar-history-head:hover{background:var(--surface-alt);}
+.thh-info{display:flex;flex-direction:column;gap:3px;}
+.thh-summary{font-weight:700;font-size:13.5px;}
+.thh-date{font-size:11.5px;color:var(--text-muted);}
+.actions-cell{display:flex;gap:6px;}
+.tagar-history-body{display:none;padding:0 14px 14px;background:var(--surface-alt);}
+.tagar-history-body.open{display:block;}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;color:var(--text-muted);text-align:center;gap:6px;}
+.empty-state .es-icon{font-size:34px;}
+
+/* Toast */
+#toastContainer{position:fixed;top:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:9999;}
+.toast{
+    background:var(--text-primary);color:#fff;padding:12px 16px;border-radius:10px;
+    font-size:13.5px;font-weight:600;box-shadow:var(--shadow-lg);
+    animation:toastIn .2s ease-out; max-width:320px;
+}
+.toast.success{background:var(--success);}
+.toast.danger{background:var(--danger);}
+.toast.info{background:var(--primary);}
+@keyframes toastIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+
+/* Modal */
+.modal-overlay{
+    position:fixed;inset:0;background:rgba(18,19,31,0.45);
+    display:none;align-items:center;justify-content:center;z-index:9998;padding:20px;
+}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#fff;border-radius:var(--radius-lg);padding:24px;max-width:380px;width:100%;box-shadow:var(--shadow-lg);text-align:center;}
+.modal-icon{font-size:34px;margin-bottom:8px;}
+.modal-title{font-family:var(--font-display);font-weight:800;font-size:17px;margin-bottom:8px;}
+.modal-body{color:var(--text-secondary);font-size:13.5px;margin-bottom:20px;}
+.modal-actions{display:flex;gap:10px;}
+.modal-actions .btn{flex:1;justify-content:center;}
+
+@media(max-width:520px){
+    .tagar-groups-grid{grid-template-columns:1fr;}
+    .page-head h1{font-size:22px;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+    <div class="page-head">
+        <h1>🏷️ Hashtag Splitter</h1>
+        <p>Bulk-input hashtags, automatically split into multiple tables &middot; stored locally in your browser (localStorage), no server needed.</p>
+    </div>
+
+    <section class="panel">
+        <div class="panel-title">✍️ Input Hashtags</div>
+
+        <label class="field-label" for="tagarOwnerName">Owner Name</label>
+        <input type="text" id="tagarOwnerName" class="text-input" placeholder="e.g. John, Marketing Team, Store A...">
+        <div class="hint" style="margin-top:6px;margin-bottom:14px;">Whose hashtags are these? This name will be shown on the result and in the history so you know who each batch belongs to.</div>
+
+        <textarea id="tagarBulkInput" placeholder="Paste or type your hashtag list here...&#10;One hashtag per line, or separated by commas.&#10;Example:&#10;#promo&#10;#sale, #flashsale"></textarea>
+        <div class="hint">Supported separators: new line and comma. Duplicates (case-insensitive) are detected automatically.</div>
+
+        <div class="stats-row">
+            <span class="chip chip-info" id="tagarLiveTotal">Total: 0</span>
+            <span class="chip chip-info" id="tagarLiveUnique">Unique: 0</span>
+            <span class="chip chip-success" id="tagarLiveDup">✅ No Duplicates</span>
+            <span class="chip chip-info" id="tagarLiveGroups">Estimated Tables: 0</span>
+        </div>
+
+        <div class="actions-row">
+            <button type="button" class="btn btn-primary" onclick="handleProcessTagar()">⚡ Input & Split Hashtags</button>
+            <button type="button" class="btn btn-outline" onclick="document.getElementById('tagarBulkInput').value='';updateTagarLivePreview();">🧹 Clear</button>
+        </div>
+    </section>
+
+    <div id="tagarActiveResult"></div>
+
+    <section class="panel">
+        <div class="panel-title">🕘 Batch History</div>
+        <div class="history-filter-row">
+            <input type="text" id="tagarHistoryFilter" class="text-input" placeholder="🔍 Filter by owner name...">
+        </div>
+        <div id="tagarHistoryList"></div>
+        <div class="empty-state" id="tagarHistoryEmpty">
+            <div class="es-icon">📭</div>
+            <div>No hashtag batch history yet</div>
+        </div>
+    </section>
+</div>
+
+<div id="toastContainer"></div>
+
+<div class="modal-overlay" id="confirmModalOverlay">
+    <div class="modal-box">
+        <div class="modal-icon" id="confirmModalIcon">🗑</div>
+        <div class="modal-title" id="confirmModalTitle">Delete?</div>
+        <div class="modal-body" id="confirmModalBody">This action cannot be undone.</div>
+        <div class="modal-actions">
+            <button type="button" class="btn btn-outline" onclick="closeConfirmModal()">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirmModalConfirmBtn">Yes, Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ====================================================================
+   HASHTAG SPLITTER — standalone version (localStorage as "database")
+   Flow & table-splitting rules are the same as the Supabase version,
+   only the storage layer is swapped to browser localStorage.
+   ==================================================================== */
+
+const TAGAR_MAX_PER_GROUP = 200;
+const TAGAR_MIN_PER_GROUP = 100;
+const STORAGE_KEY = "tagar_batches_db";
+
+/* ---------------- "Database" localStorage helper ---------------- */
+
+function dbGetAll() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        console.error(e);
+        return [];
+    }
+}
+
+function dbSaveAll(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+function dbInsert(batch) {
+    const list = dbGetAll();
+    const nextId = list.length > 0 ? Math.max(...list.map(b => b.id)) + 1 : 1;
+    const record = Object.assign({ id: nextId, created_at: new Date().toISOString() }, batch);
+    list.push(record);
+    dbSaveAll(list);
+    return record;
+}
+
+function dbGetById(id) {
+    return dbGetAll().find(b => b.id === id) || null;
+}
+
+function dbDelete(id) {
+    const list = dbGetAll().filter(b => b.id !== id);
+    dbSaveAll(list);
+}
+
+/* ---------------- Utils ---------------- */
+
+function escapeHtml(str) {
+    if (str === null || str === undefined) return "";
+    return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function formatDateHuman(dateInput) {
+    const d = new Date(dateInput);
+    if (isNaN(d)) return "-";
+    return d.toLocaleString("en-US", {
+        day: "2-digit", month: "short", year: "numeric",
+        hour: "2-digit", minute: "2-digit"
+    });
+}
+
+function showToast(message, type = "info") {
+    const container = document.getElementById("toastContainer");
+    const el = document.createElement("div");
+    el.className = `toast ${type}`;
+    el.textContent = message;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 3200);
+}
+
+/* ---------------- Confirmation modal ---------------- */
+
+let _confirmCallback = null;
+
+function openConfirmModal({ icon = "🗑", title = "Confirm", body = "", confirmText = "Yes, Delete", onConfirm }) {
+    document.getElementById("confirmModalIcon").textContent = icon;
+    document.getElementById("confirmModalTitle").textContent = title;
+    document.getElementById("confirmModalBody").textContent = body;
+    const btn = document.getElementById("confirmModalConfirmBtn");
+    btn.textContent = confirmText;
+    _confirmCallback = onConfirm;
+    document.getElementById("confirmModalOverlay").classList.add("open");
+}
+
+function closeConfirmModal() {
+    document.getElementById("confirmModalOverlay").classList.remove("open");
+    _confirmCallback = null;
+}
+
+document.getElementById("confirmModalConfirmBtn").addEventListener("click", () => {
+    const cb = _confirmCallback;
+    closeConfirmModal();
+    if (cb) cb();
+});
+
+/* ---------------- Hashtag parsing & splitting ---------------- */
+
+function parseTagarBulk(rawText) {
+    const tokens = (rawText || "")
+        .split(/[\n,]+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+    const countMap = new Map();
+    const firstSeen = new Map();
+    const positions = new Map();
+
+    tokens.forEach((t, i) => {
+        const key = t.toLowerCase();
+        countMap.set(key, (countMap.get(key) || 0) + 1);
+        if (!firstSeen.has(key)) firstSeen.set(key, t);
+        if (!positions.has(key)) positions.set(key, []);
+        positions.get(key).push(i + 1);
+    });
+
+    const duplicates = [];
+    countMap.forEach((count, key) => {
+        if (count > 1) {
+            duplicates.push({ tagar: firstSeen.get(key), count, positions: positions.get(key) });
+        }
+    });
+    duplicates.sort((a, b) => b.count - a.count);
+
+    return {
+        tokens,
+        total: tokens.length,
+        uniqueCount: countMap.size,
+        duplicateCount: tokens.length - countMap.size,
+        duplicates
+    };
+}
+
+function splitTagarIntoGroups(tokens) {
+    const n = tokens.length;
+    if (n <= TAGAR_MAX_PER_GROUP) {
+        return [tokens.slice()];
+    }
+    const k = Math.ceil(n / TAGAR_MAX_PER_GROUP);
+    const base = Math.floor(n / k);
+    const remainder = n % k;
+
+    const groups = [];
+    let idx = 0;
+    for (let i = 0; i < k; i++) {
+        const size = base + (i < remainder ? 1 : 0);
+        groups.push(tokens.slice(idx, idx + size));
+        idx += size;
+    }
+    return groups;
+}
+
+/* ---------------- Live preview ---------------- */
+
+function updateTagarLivePreview() {
+    const textarea = document.getElementById("tagarBulkInput");
+    const parsed = parseTagarBulk(textarea.value);
+
+    document.getElementById("tagarLiveTotal").innerText = `Total: ${parsed.total}`;
+    document.getElementById("tagarLiveUnique").innerText = `Unique: ${parsed.uniqueCount}`;
+
+    const chipDup = document.getElementById("tagarLiveDup");
+    if (parsed.duplicateCount > 0) {
+        chipDup.className = "chip chip-danger";
+        chipDup.innerText = `⚠️ ${parsed.duplicateCount} Duplicates`;
+    } else {
+        chipDup.className = "chip chip-success";
+        chipDup.innerText = "✅ No Duplicates";
+    }
+
+    const estGroups = parsed.total > 0 ? splitTagarIntoGroups(parsed.tokens).length : 0;
+    document.getElementById("tagarLiveGroups").innerText = `Estimated Tables: ${estGroups}`;
+}
+
+document.getElementById("tagarBulkInput").addEventListener("input", updateTagarLivePreview);
+
+/* ---------------- Process & save batch ---------------- */
+
+function handleProcessTagar() {
+    const textarea = document.getElementById("tagarBulkInput");
+    const rawText = textarea.value;
+    const parsed = parseTagarBulk(rawText);
+
+    const ownerNameInput = document.getElementById("tagarOwnerName");
+    const ownerName = (ownerNameInput.value || "").trim();
+
+    if (ownerName === "") {
+        showToast("Please enter the owner name first", "danger");
+        ownerNameInput.focus();
+        return;
+    }
+
+    if (parsed.total === 0) {
+        showToast("Please enter at least one hashtag", "danger");
+        return;
+    }
+
+    const groups = splitTagarIntoGroups(parsed.tokens);
+
+    const data = dbInsert({
+        owner_name: ownerName,
+        raw_input: rawText.trim(),
+        total_tagar: parsed.total,
+        unique_tagar: parsed.uniqueCount,
+        duplicate_count: parsed.duplicateCount,
+        group_count: groups.length,
+        groups: groups,
+        duplicates: parsed.duplicates
+    });
+
+    showToast(`${parsed.total} hashtags successfully split into ${groups.length} tables`, "success");
+    renderTagarActiveResult(data);
+    loadTagarHistory();
+}
+
+/* ---------------- Render active result ---------------- */
+
+function renderTagarActiveResult(batch) {
+    const container = document.getElementById("tagarActiveResult");
+    if (!container) return;
+
+    const duplicates = batch.duplicates || [];
+    const groups = batch.groups || [];
+
+    const duplicateHtml = duplicates.length > 0
+        ? `
+            <div class="tagar-duplicate-panel">
+                <div class="tdp-title">⚠️ ${duplicates.length} Duplicate Hashtags Detected</div>
+                <div class="tagar-duplicate-list">
+                    ${duplicates.map(d => `
+                        <div class="tagar-duplicate-item">
+                            <span class="tdi-name">${escapeHtml(d.tagar)}</span>
+                            <span class="tdi-meta">${d.count}× &middot; line ${d.positions.join(", ")}</span>
+                        </div>
+                    `).join("")}
+                </div>
+            </div>
+        `
+        : `<div class="tagar-clean-panel">✅ No duplicate hashtags — all hashtags are unique.</div>`;
+
+    const dupKeys = new Set(duplicates.map(d => d.tagar.toLowerCase()));
+
+    const groupsHtml = groups.map((group, gi) => {
+        const linesHtml = group.map((tag, ti) => {
+            const isDup = dupKeys.has(tag.toLowerCase());
+            return `<div class="tg-line"><span class="tg-idx ${isDup ? "is-dup" : ""}">${ti + 1}.</span><span>${escapeHtml(tag)}</span></div>`;
+        }).join("");
+
+        return `
+            <div class="tagar-group-card">
+                <div class="tgc-head">
+                    <span class="tgc-title">🏷️ Table ${gi + 1}</span>
+                    <span class="chip chip-info">${group.length} hashtags</span>
+                </div>
+                <div class="tagar-group-box">${linesHtml}</div>
+                <button type="button" class="btn btn-outline btn-block" onclick="copyTagarGroup(${batch.id}, ${gi})">📋 Copy Table ${gi + 1}</button>
+            </div>
+        `;
+    }).join("");
+
+    container.innerHTML = `
+        <section class="panel">
+            <div class="tagar-result-header">
+                <div class="panel-title" style="margin-bottom:0;">📊 Hashtag Split Results</div>
+                <button type="button" class="btn btn-primary" onclick="copyAllTagarBatch(${batch.id})">📑 Copy All Hashtags</button>
+            </div>
+
+            <div class="stats-row" style="margin-bottom:16px;">
+                <span class="owner-badge">👤 ${escapeHtml(batch.owner_name || "Unknown")}</span>
+                <span class="chip chip-info">Total Hashtags: ${batch.total_tagar}</span>
+                <span class="chip chip-info">Unique Hashtags: ${batch.unique_tagar}</span>
+                <span class="chip ${batch.duplicate_count > 0 ? "chip-danger" : "chip-success"}">
+                    ${batch.duplicate_count > 0 ? `⚠️ ${batch.duplicate_count} Duplicates` : "✅ No Duplicates"}
+                </span>
+                <span class="chip chip-info">📁 ${batch.group_count} Tables Generated</span>
+            </div>
+
+            ${duplicateHtml}
+
+            <div class="tagar-groups-grid">${groupsHtml}</div>
+        </section>
+    `;
+
+    window._activeTagarBatch = batch;
+}
+
+/* ---------------- Copy actions ---------------- */
+
+async function copyTagarGroup(batchId, groupIndex) {
+    const batch = dbGetById(batchId);
+    if (!batch) return;
+
+    const group = batch.groups[groupIndex] || [];
+    if (group.length === 0) {
+        showToast("This table is empty", "danger");
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(group.join("\n"));
+        showToast(`Table ${groupIndex + 1} (${group.length} hashtags) copied successfully`, "success");
+    } catch (err) {
+        console.error(err);
+        showToast("Failed to copy table", "danger");
+    }
+}
+
+async function copyAllTagarBatch(batchId) {
+    const batch = dbGetById(batchId);
+    if (!batch) return;
+
+    const allTags = (batch.groups || []).flat();
+    if (allTags.length === 0) {
+        showToast("No hashtags to copy", "danger");
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(allTags.join("\n"));
+        showToast(`All ${allTags.length} hashtags copied successfully`, "success");
+    } catch (err) {
+        console.error(err);
+        showToast("Failed to copy hashtags", "danger");
+    }
+}
+
+/* ---------------- Batch history ---------------- */
+
+function loadTagarHistory() {
+    const container = document.getElementById("tagarHistoryList");
+    const emptyState = document.getElementById("tagarHistoryEmpty");
+    if (!container) return;
+
+    const fullList = dbGetAll().slice().sort((a, b) => b.id - a.id);
+
+    if (fullList.length === 0) {
+        container.innerHTML = "";
+        emptyState.style.display = "flex";
+        return;
+    }
+    emptyState.style.display = "none";
+
+    if (!window._activeTagarBatch && fullList.length > 0) {
+        renderTagarActiveResult(fullList[0]);
+    }
+
+    const filterInput = document.getElementById("tagarHistoryFilter");
+    const filterQuery = (filterInput && filterInput.value || "").trim().toLowerCase();
+    const list = filterQuery
+        ? fullList.filter(b => (b.owner_name || "").toLowerCase().includes(filterQuery))
+        : fullList;
+
+    if (list.length === 0) {
+        container.innerHTML = `<div class="empty-state" style="padding:24px 10px;"><div class="es-icon">🔍</div><div>No batches found for owner "${escapeHtml(filterQuery)}"</div></div>`;
+        return;
+    }
+
+    container.innerHTML = list.map(batch => `
+        <div class="tagar-history-item">
+            <div class="tagar-history-head" onclick="toggleTagarHistoryItem(${batch.id})">
+                <div class="thh-info">
+                    <span class="thh-summary">
+                        <span class="owner-badge" style="margin-right:6px;">👤 ${escapeHtml(batch.owner_name || "Unknown")}</span>
+                        🏷️ ${batch.total_tagar} hashtags &middot; ${batch.group_count} tables${batch.duplicate_count > 0 ? ` &middot; ⚠️ ${batch.duplicate_count} duplicates` : ""}
+                    </span>
+                    <span class="thh-date">${formatDateHuman(batch.created_at)}</span>
+                </div>
+                <div class="actions-cell" onclick="event.stopPropagation()">
+                    <button type="button" class="btn btn-outline btn-icon" onclick="showTagarBatchInActive(${batch.id})" title="Show above">👁️</button>
+                    <button type="button" class="btn btn-danger btn-icon" onclick="deleteTagarBatch(${batch.id})" title="Delete">🗑</button>
+                </div>
+            </div>
+            <div class="tagar-history-body" id="tagarHistoryBody-${batch.id}"></div>
+        </div>
+    `).join("");
+}
+
+document.getElementById("tagarHistoryFilter").addEventListener("input", loadTagarHistory);
+
+function showTagarBatchInActive(id) {
+    const batch = dbGetById(id);
+    if (!batch) return;
+    renderTagarActiveResult(batch);
+    document.getElementById("tagarActiveResult").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function toggleTagarHistoryItem(id) {
+    const body = document.getElementById(`tagarHistoryBody-${id}`);
+    if (!body) return;
+
+    const isOpen = body.classList.contains("open");
+    if (isOpen) {
+        body.classList.remove("open");
+        body.innerHTML = "";
+        return;
+    }
+
+    const batch = dbGetById(id);
+    if (!batch) return;
+
+    body.innerHTML = (batch.groups || []).map((group, gi) => `
+        <div class="tagar-group-card" style="margin-bottom:10px;">
+            <div class="tgc-head">
+                <span class="tgc-title">Table ${gi + 1}</span>
+                <span class="chip chip-info">${group.length} hashtags</span>
+            </div>
+            <div class="tagar-group-box">${group.map((t, ti) => `<div class="tg-line"><span class="tg-idx">${ti + 1}.</span><span>${escapeHtml(t)}</span></div>`).join("")}</div>
+            <button type="button" class="btn btn-outline btn-block" onclick="copyTagarGroup(${batch.id}, ${gi})">📋 Copy Table ${gi + 1}</button>
+        </div>
+    `).join("");
+    body.classList.add("open");
+}
+
+function deleteTagarBatch(id) {
+    openConfirmModal({
+        icon: "🗑",
+        title: "Delete Hashtag History?",
+        body: "This hashtag batch and all its split tables will be permanently deleted from local storage.",
+        confirmText: "Yes, Delete",
+        onConfirm: () => {
+            dbDelete(id);
+            if (window._activeTagarBatch && window._activeTagarBatch.id === id) {
+                window._activeTagarBatch = null;
+                document.getElementById("tagarActiveResult").innerHTML = "";
+            }
+            showToast("Hashtag history deleted", "danger");
+            loadTagarHistory();
+        }
+    });
+}
+
+/* ---------------- Init ---------------- */
+
+updateTagarLivePreview();
+loadTagarHistory();
+</script>
+</body>
+</html>
